@@ -6,6 +6,8 @@ on:
 
 jobs:
   build:
+    environment:
+      name: github-pages
     permissions:
       contents: read
       pages: write
