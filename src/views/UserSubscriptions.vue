@@ -19,6 +19,8 @@
               Start: {{ formatDate(sub.startDate) }}<br>
               End: {{ formatDate(sub.endDate) }}
             </p>
+            <p class="device">Device: {{ sub.deviceName }}</p>
+            <p class="device-id">Device ID: {{ sub.deviceId }}</p>
           </div>
           <div class="subscription-actions">
             <button 
@@ -50,7 +52,7 @@
           </div>
           <div class="subscription-actions">
             <button 
-              @click="subscribeToLicense(license.id)"
+              @click="showSubscriptionModalPage(license)"
               class="btn-submit"
             >
               Subscribe Now
@@ -59,17 +61,62 @@
         </div>
       </div>
     </div>
+
+    <!-- Subscription Modal -->
+    <div v-if="showSubscriptionModal" class="modal">
+      <div class="modal-content">
+        <h3>Subscribe to {{ selectedLicense?.name }}</h3>
+        <form @submit.prevent="handleSubscription" class="subscription-form">
+          <div class="form-group">
+            <label for="deviceName">Device Name</label>
+            <input 
+              type="text" 
+              id="deviceName" 
+              v-model="subscriptionForm.deviceName" 
+              required
+              placeholder="Enter device name"
+            >
+          </div>
+          <div class="form-group">
+            <label for="deviceId">Device ID</label>
+            <input 
+              type="text" 
+              id="deviceId" 
+              v-model="subscriptionForm.deviceId" 
+              required
+              placeholder="Enter device ID"
+            >
+          </div>
+          <div class="modal-actions">
+            <button type="button" @click="showSubscriptionModal = false" class="btn-cancel">
+              Cancel
+            </button>
+            <button type="submit" class="btn-submit">
+              Subscribe
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useAppStore } from '../stores/app'
 
 const store = useAppStore()
 
+// Subscription management
+const showSubscriptionModal = ref(false)
+const selectedLicense = ref(null)
+const subscriptionForm = ref({
+  deviceName: '',
+  deviceId: ''
+})
+
 const userSubscriptions = computed(() => {
-  return store.subscriptions.filter(sub => sub.userId === store.currentUser.id)
+  return store.userSubscriptions(store.currentUser.id)
 })
 
 const availableLicenses = computed(() => {
@@ -90,21 +137,31 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString()
 }
 
-const subscribeToLicense = (licenseId) => {
-  const license = store.licenses.find(l => l.id === licenseId)
-  if (!license) return
+const showSubscriptionModalPage = (license) => {
+  selectedLicense.value = license
+  showSubscriptionModal.value = true
+}
 
-  const newSubscription = {
-    id: String(store.subscriptions.length + 1),
-    userId: store.currentUser.id,
-    licenseId: license.id,
-    startDate: new Date().toISOString(),
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-    status: 'active',
-    price: license.price
+const handleSubscription = () => {
+  try {
+    const newSubscription = {
+      id: String(store.subscriptions.length + 1),
+      userId: store.currentUser.id,
+      deviceId: subscriptionForm.value.deviceId,
+      deviceName: subscriptionForm.value.deviceName,
+      licenseId: selectedLicense.value.id,
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+      status: 'active',
+      price: selectedLicense.value.price
+    }
+
+    store.addSubscription(newSubscription)
+    showSubscriptionModal.value = false
+    subscriptionForm.value = { deviceName: '', deviceId: '' }
+  } catch (error) {
+    alert(error.message)
   }
-
-  store.addSubscription(newSubscription)
 }
 
 const cancelSubscription = (subscriptionId) => {
@@ -171,17 +228,14 @@ const cancelSubscription = (subscriptionId) => {
   font-size: 0.875rem;
 }
 
-.subscription-details .price {
+.subscription-details .price,
+.device-details .device-id {
   color: var(--gray-900);
   font-weight: 600;
   font-size: 1.25rem;
 }
 
-.subscription-details .duration {
-  color: var(--gray-500);
-  font-size: 0.875rem;
-}
-
+.subscription-details .duration,
 .subscription-details .dates {
   color: var(--gray-600);
   font-size: 0.875rem;
@@ -195,6 +249,13 @@ const cancelSubscription = (subscriptionId) => {
   text-align: center;
   color: var(--gray-500);
   padding: 2rem;
+}
+
+.activation-form,
+.subscription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {

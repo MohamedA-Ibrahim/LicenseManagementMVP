@@ -41,7 +41,6 @@
       </table>
     </div>
 
-    <!-- Add/Edit Subscription Modal -->
     <div v-if="showAddSubscriptionModal" class="modal">
       <div class="modal-content">
         <h3>{{ editingSubscription ? 'Edit Subscription' : 'Create New Subscription' }}</h3>

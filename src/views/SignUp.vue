@@ -87,7 +87,7 @@ const handleSignUp = async () => {
       id: String(store.users.length + 1),
       name: form.name,
       email: form.email,
-      password: form.password, // In a real app, this would be hashed
+      password: form.password,
       role: 'user',
       status: 'active',
       subscriptions: [],

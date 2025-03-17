@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard-section">
     <div class="dashboard-grid">
-      <!-- Statistics Cards -->
       <div class="stat-card">
         <div class="stat-icon">
           <i class="fas fa-users"></i>

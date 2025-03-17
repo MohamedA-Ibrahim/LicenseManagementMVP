@@ -27,7 +27,7 @@ const routes = [
     path: '/',
     name: 'Dashboard',
     component: Dashboard,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/users',
@@ -67,9 +67,9 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !currentUser) {
     next('/signin')
   } else if (to.meta.requiresAdmin && currentUser?.role !== 'admin') {
-    next('/')
+    next('/my-subscriptions')
   } else if ((to.path === '/signin' || to.path === '/signup') && currentUser) {
-    next('/')
+    next(currentUser.role === 'admin' ? '/' : '/my-subscriptions')
   } else {
     next()
   }

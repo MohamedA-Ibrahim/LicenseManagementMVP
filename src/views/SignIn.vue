@@ -49,7 +49,6 @@ const form = reactive({
 
 const handleSignIn = async () => {
   try {
-    // In a real app, this would be an API call
     const user = store.users.find(u => u.email === form.email && u.password === form.password)
     
     if (user) {

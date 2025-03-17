@@ -73,6 +73,12 @@ export const useAppStore = defineStore('app', {
         const endDate = new Date(sub.endDate)
         return sub.status === 'active' && endDate <= thirtyDaysFromNow && endDate > now
       })
+    },
+    userSubscriptions: (state) => (userId) => {
+      return state.subscriptions.filter(sub => sub.userId === userId)
+    },
+    deviceSubscriptions: (state) => (deviceId) => {
+      return state.subscriptions.filter(sub => sub.deviceId === deviceId)
     }
   },
 
@@ -119,6 +125,17 @@ export const useAppStore = defineStore('app', {
     },
 
     addSubscription(subscription) {
+      // Check if device already has an active subscription for this license
+      const existingSubscription = this.subscriptions.find(
+        sub => sub.deviceId === subscription.deviceId && 
+              sub.licenseId === subscription.licenseId && 
+              sub.status === 'active'
+      )
+
+      if (existingSubscription) {
+        throw new Error('Device already has an active subscription for this license')
+      }
+
       this.subscriptions.push(subscription)
       const license = this.licenses.find(l => l.id === subscription.licenseId)
       if (license) {

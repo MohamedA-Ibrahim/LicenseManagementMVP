@@ -8,7 +8,6 @@
       </button>
     </div>
 
-    <!-- User Filters -->
     <div class="filters">
       <div class="search-box">
         <i class="fas fa-search"></i>
@@ -64,7 +63,6 @@
       </table>
     </div>
 
-    <!-- Add/Edit User Modal -->
     <div v-if="showAddUserModal" class="modal">
       <div class="modal-content">
         <h3>{{ editingUser ? 'Edit User' : 'Add New User' }}</h3>
@@ -136,7 +134,6 @@ const filteredUsers = computed(() => {
     )
   }
 
-  // Apply status filter
   if (statusFilter.value) {
     users = users.filter(user => user.status === statusFilter.value)
   }
@@ -184,7 +181,6 @@ const formatDate = (dateString) => {
 }
 
 const filterUsers = () => {
-  // The filtering is handled by the computed property
 }
 </script>
 
