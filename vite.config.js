@@ -12,4 +12,10 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  base: '/LicenseManagementMVP/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true
+  }
 }) 
